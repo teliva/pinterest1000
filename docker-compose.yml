@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: pinterest_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  content_api:
+    build:
+      context: ./src/api
+      dockerfile: Dockerfile
+    container_name: pinterest_content_api
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./content:/app/content:ro
+    environment:
+      CONTENT_DIR: /app/content
+
+  app:
+    image: nginx:alpine
+    container_name: pinterest_app
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    volumes:
+      - ./src/app:/usr/share/nginx/html:ro
+
+volumes:
+  postgres_data:
