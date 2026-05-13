@@ -1,16 +1,16 @@
 services:
-  content_api:
-    build:
-      context: ./src/api
-      dockerfile: Dockerfile
-    container_name: pinterest_content_api
-    restart: unless-stopped
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./content:/app/content:ro
-    environment:
-      CONTENT_DIR: /app/content
+  # content_api:
+  #   build:
+  #     context: ./src/api
+  #     dockerfile: Dockerfile
+  #   container_name: pinterest_content_api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8081:8080"
+  #   volumes:
+  #     - ./content:/app/content:ro
+  #   environment:
+  #     CONTENT_DIR: /app/content
 
   app:
     image: nginx:alpine
@@ -23,16 +23,26 @@ services:
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2025-latest
-    container_name: pinterest_mssql
-    restart: unless-stopped
+    container_name: sql_server_dev
     ports:
-      - "1433:1433"
+      - "1435:1433"
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Your_strong_password1"
+      MSSQL_SA_PASSWORD: "YourStrongPassword123!"
       MSSQL_PID: "Developer"
+
+  mssql_init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: pinterest_mssql_init
+    depends_on:
+      - mssql
     volumes:
-      - mssql_data:/var/opt/mssql
+      - ./src/scripts:/scripts:ro
+    environment:
+      SA_PASSWORD: "YourStrongPassword123!"
+    command: >
+      bash -c "for i in {1..30}; do /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P \"$SA_PASSWORD\" -i /scripts/create_img_tables.sql && exit 0; echo 'Waiting for mssql...'; sleep 5; done; echo 'Failed to initialize database' >&2; exit 1"
+    restart: 'no'
 
   dotnet_api:
     image: mcr.microsoft.com/dotnet/sdk:10.0
@@ -46,5 +56,8 @@ services:
     environment:
       DOTNET_ENVIRONMENT: Development
     command: ["dotnet", "run", "--urls", "http://0.0.0.0:5000"]
-    depends_on:
-      - mssql
+    # depends_on:
+    #   - mssql_init
+
+volumes:
+  mssql_data:
