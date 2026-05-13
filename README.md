@@ -1,4 +1,4 @@
-# Pinterest
+# Pinterest Starter
 
 ## PostgreSQL Docker Setup
 

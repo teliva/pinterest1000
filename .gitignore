@@ -1,0 +1,86 @@
+# Visual Studio / IDE
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# .NET
+bin/
+obj/
+project.lock.json
+project.fragment.lock.json
+TestResults/
+*.vspscc
+*.vssscc
+*.dbmdl
+*.bak
+*.backup
+*.nupkg
+*.snupkg
+*.log
+*.pdb
+*.cache
+*.dll
+*.exe
+*.app
+
+# ASP.NET temporary files
+appsettings.*.json
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.venv/
+.Python
+pip-wheel-metadata/
+*.dist-info/
+
+# Docker
+docker-compose.override.yml
+docker-compose.*.yml
+*.env
+*.log
+**/Dockerfile.*
+
+# Database
+*.mdf
+*.ldf
+*.ndf
+
+# OS generated files
+*.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Editor backups
+*#
+.#*
+
+# Python virtual environments
+env/
+venv/
+.venv/
+
+# JetBrains
+.idea/
+*.iml
+
+# npm
+node_modules/

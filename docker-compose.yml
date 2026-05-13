@@ -1,17 +1,4 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: pinterest_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: postes
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   content_api:
     build:
       context: ./src/api
@@ -34,5 +21,30 @@ services:
     volumes:
       - ./src/app:/usr/share/nginx/html:ro
 
-volumes:
-  postgres_data:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: pinterest_mssql
+    restart: unless-stopped
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Your_strong_password1"
+      MSSQL_PID: "Developer"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  dotnet_api:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: pinterest_dotnet_api
+    restart: unless-stopped
+    ports:
+      - "8083:5000"
+    volumes:
+      - ./src/dotnet_api:/app:rw
+    working_dir: /app
+    environment:
+      DOTNET_ENVIRONMENT: Development
+    command: ["dotnet", "run", "--urls", "http://0.0.0.0:5000"]
+    depends_on:
+      - mssql
