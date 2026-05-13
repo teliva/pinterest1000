@@ -9,7 +9,6 @@ GO
 USE ImageDatabase;
 GO
 
-
 -- Create tables for image categorization in Microsoft SQL Server
 IF OBJECT_ID('dbo.image_categories', 'U') IS NULL
 BEGIN
