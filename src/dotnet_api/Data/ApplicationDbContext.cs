@@ -25,6 +25,33 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ImageStyle>().ToTable("image_style");
         modelBuilder.Entity<Image>().ToTable("image");
 
+        // Configure column names for snake_case SQL schema
+        modelBuilder.Entity<ImageCategory>(entity =>
+        {
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.Description).HasColumnName("description");
+        });
+
+        modelBuilder.Entity<ImageRoomType>(entity =>
+        {
+            entity.Property(e => e.RoomTypeId).HasColumnName("room_type_id");
+            entity.Property(e => e.Description).HasColumnName("description");
+        });
+
+        modelBuilder.Entity<ImageStyle>(entity =>
+        {
+            entity.Property(e => e.StyleId).HasColumnName("style_id");
+            entity.Property(e => e.Description).HasColumnName("description");
+        });
+
+        modelBuilder.Entity<Image>(entity =>
+        {
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.RoomTypeId).HasColumnName("room_type_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        });
+
         // Configure primary keys
         modelBuilder.Entity<ImageCategory>().HasKey(c => c.CategoryId);
         modelBuilder.Entity<ImageRoomType>().HasKey(r => r.RoomTypeId);
@@ -45,10 +72,27 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Image>()
-            .HasOne(i => i.Style)
+            .HasMany(i => i.Styles)
             .WithMany(s => s.Images)
-            .HasForeignKey(i => i.StyleId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .UsingEntity<Dictionary<string, object>>(
+                "image_image_style",
+                j => j
+                    .HasOne<ImageStyle>()
+                    .WithMany()
+                    .HasForeignKey("style_id")
+                    .OnDelete(DeleteBehavior.NoAction),
+                j => j
+                    .HasOne<Image>()
+                    .WithMany()
+                    .HasForeignKey("image_id")
+                    .OnDelete(DeleteBehavior.NoAction),
+                j =>
+                {
+                    j.ToTable("image_image_style");
+                    j.HasKey("image_id", "style_id");
+                    j.Property<Guid>("image_id").HasColumnName("image_id");
+                    j.Property<int>("style_id").HasColumnName("style_id");
+                });
 
         // Configure unique constraints
         modelBuilder.Entity<ImageCategory>()
@@ -71,9 +115,5 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Image>()
             .HasIndex(i => i.RoomTypeId)
             .HasDatabaseName("idx_image_room_type_id");
-
-        modelBuilder.Entity<Image>()
-            .HasIndex(i => i.StyleId)
-            .HasDatabaseName("idx_image_style_id");
     }
 }

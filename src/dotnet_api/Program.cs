@@ -152,33 +152,53 @@ app.MapDelete("/api/styles/{id}", async (int id, ApplicationDbContext db) =>
 app.MapGet("/api/images", async (ApplicationDbContext db) =>
     await db.Images.Include(i => i.Category)
                    .Include(i => i.RoomType)
-                   .Include(i => i.Style)
+                   .Include(i => i.Styles)
                    .ToListAsync());
 
 app.MapGet("/api/images/{id}", async (Guid id, ApplicationDbContext db) =>
     await db.Images.Include(i => i.Category)
                    .Include(i => i.RoomType)
-                   .Include(i => i.Style)
+                   .Include(i => i.Styles)
                    .FirstOrDefaultAsync(i => i.Id == id) is Image image
         ? Results.Ok(image)
         : Results.NotFound());
 
-app.MapPost("/api/images", async (Image image, ApplicationDbContext db) =>
+app.MapPost("/api/images", async (Image inputImage, ApplicationDbContext db) =>
 {
-    db.Images.Add(image);
+    if (inputImage.StyleIds is not null && inputImage.StyleIds.Any())
+    {
+        var styles = await db.ImageStyles
+            .Where(s => inputImage.StyleIds.Contains(s.StyleId))
+            .ToListAsync();
+        inputImage.Styles = styles;
+    }
+
+    db.Images.Add(inputImage);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/images/{image.Id}", image);
+    return Results.Created($"/api/images/{inputImage.Id}", inputImage);
 });
 
 app.MapPut("/api/images/{id}", async (Guid id, Image inputImage, ApplicationDbContext db) =>
 {
-    var image = await db.Images.FindAsync(id);
+    var image = await db.Images.Include(i => i.Styles).FirstOrDefaultAsync(i => i.Id == id);
     if (image is null) return Results.NotFound();
 
     image.CategoryId = inputImage.CategoryId;
     image.RoomTypeId = inputImage.RoomTypeId;
-    image.StyleId = inputImage.StyleId;
     image.CreatedAt = inputImage.CreatedAt;
+
+    if (inputImage.StyleIds is not null)
+    {
+        image.Styles.Clear();
+        var styles = await db.ImageStyles
+            .Where(s => inputImage.StyleIds.Contains(s.StyleId))
+            .ToListAsync();
+        foreach (var style in styles)
+        {
+            image.Styles.Add(style);
+        }
+    }
+
     await db.SaveChangesAsync();
     return Results.NoContent();
 });

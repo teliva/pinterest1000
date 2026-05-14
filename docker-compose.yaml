@@ -1,16 +1,12 @@
 services:
-  # content_api:
-  #   build:
-  #     context: ./src/api
-  #     dockerfile: Dockerfile
-  #   container_name: pinterest_content_api
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8081:8080"
-  #   volumes:
-  #     - ./content:/app/content:ro
-  #   environment:
-  #     CONTENT_DIR: /app/content
+  content_server:
+    image: nginx:alpine
+    container_name: pinterest_content_server
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./content:/usr/share/nginx/html:ro
 
   app:
     image: nginx:alpine
@@ -54,9 +50,10 @@ services:
     working_dir: /app
     environment:
       DOTNET_ENVIRONMENT: Development
-    command: ["dotnet", "run", "--urls", "http://0.0.0.0:5000"]
-    # depends_on:
-    #   - mssql_init
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+    command: ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000"]
+    depends_on:
+      - mssql_init
 
 volumes:
   mssql_data:

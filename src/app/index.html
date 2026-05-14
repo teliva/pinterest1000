@@ -1,26 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="d-flex flex-column h-100">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pinterest App</title>
+    <title>KITSAssist Starter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.4/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f5f5f5;
+        .form-control:focus {
+            border-color: inherit;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            outline: 0;
         }
-        h1 {
-            color: #e60023;
-        }
-        p {
-            color: #333;
+
+        .form-select:focus {
+            border-color: inherit;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            outline: 0;
         }
     </style>
 </head>
-<body>
-    <h1>Welcome to Pinterest App</h1>
-    <p>This is a simple webpage served from a Docker container.</p>
-    <p>Explore your content via the API at <a href="http://localhost:8081/files">http://localhost:8081/files</a></p>
+
+<body class="bg-white flex-grow-1 d-flex flex-column p-3">
+    <div class="container-lg flex-grow-1">
+        <div class="input-group mb-3 rounded-pill border border-2 overflow-hidden shadow-sm bg-light">
+            <input type="search" class="form-control rounded-pill border-0 m-1 bg-light"
+                placeholder="Search styles, rooms, or categories" aria-label="Search styles, rooms, or categories"
+                aria-describedby="button-addon2">
+            <button class="btn btn-light rounded-pill" type="button" id="button-addon2">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <div class="row g-2 mb-3">
+            <div class="col-md-2">
+                <!-- Category -->
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
+                    aria-label="Category select">
+                    <option selected>Category</option>
+                    <option value="1">Meeting & Collaboration</option>
+                    <option value="2">Social Culture & Support</option>
+                    <option value="3">Primary Workspaces</option>
+                    <option value="4">Healthcare</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <!-- Room Type -->
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
+                    aria-label="Room Type select">
+                    <option selected>Room Type</option>
+                    <option value="1">Breakout Area / Open Meeting</option>
+                    <option value="2">Conference / Boardroom</option>
+                    <option value="3">Meeting Room (Small) / Huddle</option>
+                    <option value="4">Brainstorm / Project Room</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <!-- Style -->
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
+                    aria-label="Style select">
+                    <option selected>Style</option>
+                    <option value="1">Minimalist</option>
+                    <option value="2">Mid-Century</option>
+                    <option value="3">Modern</option>
+                    <option value="4">Industrial</option>
+                </select>
+            </div>
+        </div>
+
+
+
+    <!-- Display my outputs -->
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col">
+            <div class="card border rounded-4 shadow-sm position-relative h-100">
+                <button type="button"
+                    class="btn btn-primary btn-sm rounded-circle shadow-sm position-absolute bottom-0 end-0 m-2"
+                    title="Open image" aria-label="Open image">
+                    <i class="bi bi-arrow-right-circle"></i>
+                </button>
+                <img class="img-fluid rounded-4"
+                    src="http://localhost:8081/content/1bb3eb27-85f9-4f63-9dc6-9343aa8ac96a.png" alt="Preview image">
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+        </script>
 </body>
+
 </html>
