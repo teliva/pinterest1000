@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KITSAssist Starter</title>
+    <link rel="icon" type="image/x-icon" href="/KISP_Logo_Square_Dark_Teal.svg">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.4/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.4/font/bootstrap-icons.css" rel="stylesheet"
+        crossorigin="anonymous">
     <style>
         .form-control:focus {
             border-color: inherit;
@@ -24,6 +26,7 @@
         }
     </style>
     <script type="module" src="./main.js"></script>
+    <ic
 </head>
 
 <body class="bg-white flex-grow-1 d-flex flex-column p-3">
@@ -39,57 +42,42 @@
         <div class="row g-2 mb-3">
             <div class="col-md-2">
                 <!-- Category -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
-                    aria-label="Category select">
-                    <option selected>Category</option>
-                    <option value="1">Meeting & Collaboration</option>
-                    <option value="2">Social Culture & Support</option>
-                    <option value="3">Primary Workspaces</option>
-                    <option value="4">Healthcare</option>
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Category select"
+                    id="category-filter">
+                    <option value="" selected>Choose a category...</option>
                 </select>
             </div>
 
             <div class="col-md-2">
                 <!-- Room Type -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
-                    aria-label="Room Type select">
-                    <option selected>Room Type</option>
-                    <option value="1">Breakout Area / Open Meeting</option>
-                    <option value="2">Conference / Boardroom</option>
-                    <option value="3">Meeting Room (Small) / Huddle</option>
-                    <option value="4">Brainstorm / Project Room</option>
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Room Type select"
+                    id="room-type-filter">
+                    <option value="" selected>Choose a room type...</option>
                 </select>
             </div>
 
             <div class="col-md-2">
                 <!-- Style -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
-                    aria-label="Style select">
-                    <option selected>Style</option>
-                    <option value="1">Minimalist</option>
-                    <option value="2">Mid-Century</option>
-                    <option value="3">Modern</option>
-                    <option value="4">Industrial</option>
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Style select" id="styles-filter">
+                    <option value="" selected>Choose a style...</option>
                 </select>
             </div>
         </div>
 
-
-
-    <!-- Display my outputs -->
-    <div class="row row-cols-1 row-cols-md-3 g-3">
-        <div class="col">
-            <div class="card border rounded-4 shadow-sm position-relative h-100">
-                <button type="button"
-                    class="btn btn-primary btn-sm rounded-circle shadow-sm position-absolute bottom-0 end-0 m-2"
-                    title="Open image" aria-label="Open image">
-                    <i class="bi bi-arrow-right-circle"></i>
-                </button>
-                <img class="img-fluid rounded-4"
-                    src="http://localhost:8081/content/1bb3eb27-85f9-4f63-9dc6-9343aa8ac96a.png" alt="Preview image">
+        <!-- Display my outputs -->
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="card border rounded-4 shadow-sm position-relative h-100">
+                    <button type="button"
+                        class="btn btn-primary btn-sm rounded-circle shadow-sm position-absolute bottom-0 end-0 m-2"
+                        title="Open image" aria-label="Open image">
+                        <i class="bi bi-arrow-right-circle"></i>
+                    </button>
+                    <img class="img-fluid rounded-4"
+                        src="http://localhost:8081/1bb3eb27-85f9-4f63-9dc6-9343aa8ac96a.png" alt="Preview image">
+                </div>
             </div>
         </div>
-    </div>
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

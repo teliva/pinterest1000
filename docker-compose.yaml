@@ -15,7 +15,7 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - ./src/app:/usr/share/nginx/html:ro
+      - ./projects/app:/usr/share/nginx/html:ro
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2025-latest
@@ -33,7 +33,7 @@ services:
     depends_on:
       - mssql
     volumes:
-      - ./src/scripts:/scripts:ro
+      - ./projects/scripts:/scripts:ro
     environment:
       SA_PASSWORD: "YourStrongPassword123!"
     command: ["bash", "/scripts/init_db.sh"]
@@ -46,7 +46,7 @@ services:
     ports:
       - "8083:5000"
     volumes:
-      - ./src/dotnet_api:/app:rw
+      - ./projects/dotnet_api:/app:rw
     working_dir: /app
     environment:
       DOTNET_ENVIRONMENT: Development
