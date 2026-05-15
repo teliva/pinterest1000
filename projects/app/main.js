@@ -13,12 +13,15 @@ async function fetchCategories() {
     }
 }
 
-
-
-
-
 document.addEventListener('DOMContentLoaded', async () => {
     const categories = await fetchCategories();
     // You can use the categories data here to populate your UI
     console.log('Fetched categories:', categories);
 });
+
+
+const profile = html`
+  <div class="card">
+    <span>User ID: ${12345}</span>
+  </div>
+`;
