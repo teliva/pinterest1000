@@ -161,11 +161,24 @@ app.MapDelete("/api/styles/{id}", async (int id, ApplicationDbContext db) =>
 });
 
 // Images endpoints
-app.MapGet("/api/images", async (ApplicationDbContext db) =>
-    await db.Images.Include(i => i.Category)
-                   .Include(i => i.RoomType)
-                   .Include(i => i.Styles)
-                   .ToListAsync());
+app.MapGet("/api/images", async (int? categoryId, int? roomTypeId, int? styleId, ApplicationDbContext db) =>
+{
+    var query = db.Images.Include(i => i.Category)
+                         .Include(i => i.RoomType)
+                         .Include(i => i.Styles)
+                         .AsQueryable();
+
+    if (categoryId.HasValue)
+        query = query.Where(i => i.CategoryId == categoryId.Value);
+
+    if (roomTypeId.HasValue)
+        query = query.Where(i => i.RoomTypeId == roomTypeId.Value);
+
+    if (styleId.HasValue)
+        query = query.Where(i => i.Styles.Any(s => s.StyleId == styleId.Value));
+
+    return await query.ToListAsync();
+});
 
 app.MapGet("/api/images/{id}", async (Guid id, ApplicationDbContext db) =>
     await db.Images.Include(i => i.Category)

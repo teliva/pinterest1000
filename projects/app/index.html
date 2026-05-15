@@ -26,7 +26,6 @@
         }
     </style>
     <script type="module" src="./main.js"></script>
-    <ic
 </head>
 
 <body class="bg-white flex-grow-1 d-flex flex-column p-3">
@@ -35,7 +34,7 @@
             <input type="search" class="form-control rounded-pill border-0 m-1 bg-light"
                 placeholder="Search styles, rooms, or categories" aria-label="Search styles, rooms, or categories"
                 aria-describedby="button-addon2">
-            <button class="btn btn-light rounded-pill" type="button" id="button-addon2">
+            <button class="btn btn-light rounded-pill" type="button" id="search-button">
                 <i class="bi bi-search"></i>
             </button>
         </div>
@@ -44,7 +43,7 @@
                 <!-- Category -->
                 <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Category select"
                     id="category-filter">
-                    <option value="" selected>Choose a category...</option>
+                    <option value="0" selected>Choose a category...</option>
                 </select>
             </div>
 
@@ -52,31 +51,24 @@
                 <!-- Room Type -->
                 <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Room Type select"
                     id="room-type-filter">
-                    <option value="" selected>Choose a room type...</option>
+                    <option value="0" selected>Choose a room type...</option>
                 </select>
             </div>
 
             <div class="col-md-2">
                 <!-- Style -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Style select" id="styles-filter">
-                    <option value="" selected>Choose a style...</option>
+                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Style select"
+                    id="styles-filter">
+                    <option value="0" selected>Choose a style...</option>
                 </select>
             </div>
         </div>
 
         <!-- Display my outputs -->
-        <div class="row row-cols-1 row-cols-md-3 g-3">
-            <div class="col">
-                <div class="card border rounded-4 shadow-sm position-relative h-100">
-                    <button type="button"
-                        class="btn btn-primary btn-sm rounded-circle shadow-sm position-absolute bottom-0 end-0 m-2"
-                        title="Open image" aria-label="Open image">
-                        <i class="bi bi-arrow-right-circle"></i>
-                    </button>
-                    <img class="img-fluid rounded-4"
-                        src="http://localhost:8081/1bb3eb27-85f9-4f63-9dc6-9343aa8ac96a.png" alt="Preview image">
-                </div>
-            </div>
+        <div class="row row-cols-1 row-cols-md-3 g-3" id="image-output-container">
+        </div>
+        <div class="d-flex flex-grow-1 justify-content-center align-items-center bg-light mt-3">
+            <h4 class="m-2 p-0"><span id="totalNumResults">tilt</span> RESULTS</h4>
         </div>
 
     </div>
@@ -84,5 +76,19 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
         </script>
 </body>
+
+<template id="custom-image">
+    <div class="col">
+        <div class="card border rounded-4 shadow-sm position-relative h-100">
+            <button type="button"
+                class="btn btn-primary btn-sm rounded-circle shadow-sm position-absolute bottom-0 end-0 m-2"
+                title="Open image" aria-label="Open image">
+                <i class="bi bi-arrow-right-circle"></i>
+            </button>
+            <img class="img-fluid rounded-4" alt="Preview image" id="card-img">
+        </div>
+
+    </div>
+</template>
 
 </html>
