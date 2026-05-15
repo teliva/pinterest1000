@@ -29,49 +29,60 @@
 </head>
 
 <body class="bg-white flex-grow-1 d-flex flex-column p-3">
-    <div class="container-lg flex-grow-1">
-        <div class="input-group mb-3 rounded-pill border border-2 overflow-hidden shadow-sm bg-light">
-            <input type="search" class="form-control rounded-pill border-0 m-1 bg-light"
-                placeholder="Search styles, rooms, or categories" aria-label="Search styles, rooms, or categories"
-                aria-describedby="button-addon2">
-            <button class="btn btn-light rounded-pill" type="button" id="search-button">
-                <i class="bi bi-search"></i>
-            </button>
+    <header class="navbar navbar-expand-lg sticky-top bg-white border-bottom py-2 mb-5">
+        <div class="container-xxl">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="./KISP_Logo_Square_Dark_Teal.svg" alt="Logo" width="40" height="40"
+                    class="d-inline-block align-text-top">
+            </a>            
         </div>
-        <div class="row g-2 mb-3">
-            <div class="col-md-2">
-                <!-- Category -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Category select"
-                    id="category-filter">
-                    <option value="0" selected>Choose a category...</option>
-                </select>
+    </header>
+    <main>
+        <div class="container-lg flex-grow-1">
+            <div class="input-group mb-3 rounded-pill border border-2 overflow-hidden shadow-sm bg-light">
+                <input type="search" class="form-control rounded-pill border-0 m-1 bg-light"
+                    placeholder="Search styles, rooms, or categories" aria-label="Search styles, rooms, or categories"
+                    aria-describedby="button-addon2">
+                <button class="btn btn-light rounded-pill" type="button" id="search-button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-md-2">
+                    <!-- Category -->
+                    <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
+                        aria-label="Category select" id="category-filter">
+                        <option value="0" selected>Choose a category...</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <!-- Room Type -->
+                    <select class="form-select text-dark bg-light border rounded-5 shadow-sm"
+                        aria-label="Room Type select" id="room-type-filter">
+                        <option value="0" selected>Choose a room type...</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <!-- Style -->
+                    <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Style select"
+                        id="styles-filter">
+                        <option value="0" selected>Choose a style...</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="col-md-2">
-                <!-- Room Type -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Room Type select"
-                    id="room-type-filter">
-                    <option value="0" selected>Choose a room type...</option>
-                </select>
+            <!-- Display my outputs -->
+            <div class="row row-cols-1 row-cols-md-3 g-3" id="image-output-container">
+            </div>
+            <div class="d-flex flex-grow-1 justify-content-center align-items-center bg-light mt-3">
+                <h4 class="m-2 p-0"><span id="totalNumResults">tilt</span> RESULTS</h4>
             </div>
 
-            <div class="col-md-2">
-                <!-- Style -->
-                <select class="form-select text-dark bg-light border rounded-5 shadow-sm" aria-label="Style select"
-                    id="styles-filter">
-                    <option value="0" selected>Choose a style...</option>
-                </select>
-            </div>
         </div>
-
-        <!-- Display my outputs -->
-        <div class="row row-cols-1 row-cols-md-3 g-3" id="image-output-container">
-        </div>
-        <div class="d-flex flex-grow-1 justify-content-center align-items-center bg-light mt-3">
-            <h4 class="m-2 p-0"><span id="totalNumResults">tilt</span> RESULTS</h4>
-        </div>
-
-    </div>
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
         </script>
