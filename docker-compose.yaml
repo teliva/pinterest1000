@@ -55,5 +55,20 @@ services:
     depends_on:
       - mssql_init
 
+  python_api:
+    build: ./projects/python_api
+    container_name: pinterest_python_api
+    restart: unless-stopped
+    ports:
+      - "8084:8000"
+    environment:
+      MSSQL_HOST: mssql
+      MSSQL_PORT: "1433"
+      MSSQL_USER: sa
+      MSSQL_PASSWORD: "YourStrongPassword123!"
+      MSSQL_DATABASE: ImageDatabase
+    depends_on:
+      - mssql_init
+
 volumes:
   mssql_data:
