@@ -5,6 +5,7 @@ from contextlib import contextmanager
 import pymssql
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
+from sentence_transformers import SentenceTransformer
 
 app = FastAPI(
     title="Image Catalog API",
@@ -42,6 +43,23 @@ class Image(BaseModel):
     styles: List[Style] = []
 
 
+class EmbeddingRequest(BaseModel):
+    text: str
+
+
+class EmbeddingResponse(BaseModel):
+    text: str
+    embedding: List[float]
+    dimensions: int
+
+
+# ---------------------------------------------------------------------------
+# Embedding model (loaded once at startup)
+# ---------------------------------------------------------------------------
+
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
 # ---------------------------------------------------------------------------
 # Database helpers
 # ---------------------------------------------------------------------------
@@ -75,28 +93,6 @@ def _row_to_dict(cursor, row) -> dict:
 # ---------------------------------------------------------------------------
 # Query functions
 # ---------------------------------------------------------------------------
-
-def query_categories() -> List[dict]:
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT category_id, description FROM image_categories ORDER BY category_id")
-            return [_row_to_dict(cur, row) for row in cur.fetchall()]
-
-
-def query_room_types() -> List[dict]:
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT room_type_id, description FROM image_room_type ORDER BY room_type_id")
-            return [_row_to_dict(cur, row) for row in cur.fetchall()]
-
-
-def query_styles() -> List[dict]:
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT style_id, description FROM image_style ORDER BY style_id")
-            return [_row_to_dict(cur, row) for row in cur.fetchall()]
-
-
 def query_images(limit: int, offset: int) -> List[dict]:
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -218,34 +214,19 @@ async def health_check():
         raise HTTPException(status_code=503, detail=str(exc))
 
 
-@app.get("/categories", response_model=List[Category])
-async def list_categories():
-    """List all image categories."""
-    rows = query_categories()
-    return [
-        Category(categoryId=r["category_id"], description=r["description"])
-        for r in rows
-    ]
-
-
-@app.get("/room-types", response_model=List[RoomType])
-async def list_room_types():
-    """List all room types."""
-    rows = query_room_types()
-    return [
-        RoomType(roomTypeId=r["room_type_id"], description=r["description"])
-        for r in rows
-    ]
-
-
-@app.get("/styles", response_model=List[Style])
-async def list_styles():
-    """List all image styles."""
-    rows = query_styles()
-    return [
-        Style(styleId=r["style_id"], description=r["description"])
-        for r in rows
-    ]
+@app.post("/embeddings", response_model=EmbeddingResponse)
+async def generate_embedding(request: EmbeddingRequest):
+    """Convert an input string into a 384-dimensional embedding vector."""
+    try:
+        vector = embedding_model.encode(request.text, show_progress_bar=False)
+        embedding = [float(x) for x in vector]
+        return EmbeddingResponse(
+            text=request.text,
+            embedding=embedding,
+            dimensions=len(embedding),
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 @app.get("/images", response_model=List[Image])
@@ -256,12 +237,3 @@ async def list_images(
     """List images with joined category, room type, and styles."""
     rows = query_images(limit, offset)
     return [normalize_image(row) for row in rows]
-
-
-@app.get("/images/{image_id}", response_model=Image)
-async def get_image(image_id: str):
-    """Get a single image by ID."""
-    row = query_image(image_id)
-    if row is None:
-        raise HTTPException(status_code=404, detail="Image not found")
-    return normalize_image(row)
