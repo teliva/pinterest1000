@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -238,4 +239,22 @@ app.MapDelete("/api/images/{id}", async (Guid id, ApplicationDbContext db) =>
     return Results.NoContent();
 });
 
+// Embeddings endpoint
+app.MapPost("/api/embeddings", async (EmbeddingRequest req, IHttpClientFactory httpClientFactory) =>
+{
+    var client = httpClientFactory.CreateClient();
+    var response = await client.PostAsJsonAsync("http://python_api:8000/embeddings", new { text = req.text });
+    
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.Problem("Failed to generate embedding from Python API.");
+    }
+
+    var result = await response.Content.ReadFromJsonAsync<PythonEmbeddingResponse>();
+    return Results.Ok(result);
+});
+
 app.Run();
+
+public record EmbeddingRequest(string text);
+public record PythonEmbeddingResponse(string text, float[] embedding, int dimensions);
