@@ -107,7 +107,8 @@ async function getImages(searchText = '') {
       url.searchParams.append("categoryId", selectedCategory);
     if (selectedRoomType)
       url.searchParams.append("roomTypeId", selectedRoomType);
-    if (selectedStyle) url.searchParams.append("styleId", selectedStyle);
+    if (selectedStyle) 
+      url.searchParams.append("styleId", selectedStyle);
 
     const response = await fetch(url, {
       method: "POST",
@@ -118,7 +119,9 @@ async function getImages(searchText = '') {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const images = await response.json();
+    
     return images;
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -133,13 +136,13 @@ async function populateImagesFromSearch() {
 
   const container = document.getElementById('image-output-container');
   container.replaceChildren();
+  console.log(images);
 
-  images.slice(0,3).forEach(image => {
+  images.images.slice(0,3).forEach(image => {
     container.appendChild(insertImageCard(image.id));
   });
   
-
-  document.querySelector('#totalNumResults').textContent = images.length;
+  document.querySelector('#totalNumResults').textContent = images.images.length;
 }
 
 function insertImageCard(imageUrl) {

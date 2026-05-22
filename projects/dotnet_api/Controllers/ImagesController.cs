@@ -33,7 +33,7 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
     public async Task<IActionResult> Search([FromQuery] int? categoryId, [FromQuery] int? roomTypeId, [FromQuery] int? styleId, EmbeddingRequest req)
     {
         float[]? embedding = null;
-        if (req.text != null)
+        if (!string.IsNullOrWhiteSpace(req.text))
         {
             var client = httpClientFactory.CreateClient();
             var response = await client.PostAsJsonAsync("http://python_api:8000/embeddings", new { text = req.text });
@@ -45,39 +45,54 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
             embedding = result?.embedding;
         }
 
+        double? categoryScore = null, roomTypeScore = null, styleScore = null;
+
         if (embedding != null)
         {
             var vectorJson = $"[{string.Join(",", embedding)}]";
 
             if (!categoryId.HasValue)
-                categoryId = await db.Database
-                    .SqlQuery<int>($"""
-                        SELECT TOP 1 category_id AS Value
+            {
+                var match = await db.Database
+                    .SqlQuery<SimilarityMatch>($"""
+                        SELECT TOP 1 category_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
                         FROM image_categories
                         WHERE embedding IS NOT NULL
-                        ORDER BY VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384)))
+                        ORDER BY Score
                         """)
                     .FirstOrDefaultAsync();
+                
+                categoryScore = match?.Score;
+                if (match?.Score < 0.4) categoryId = match?.Id;
+            }
 
             if (!roomTypeId.HasValue)
-                roomTypeId = await db.Database
-                    .SqlQuery<int>($"""
-                        SELECT TOP 1 room_type_id AS Value
+            {
+                var match = await db.Database
+                    .SqlQuery<SimilarityMatch>($"""
+                        SELECT TOP 1 room_type_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
                         FROM image_room_type
                         WHERE embedding IS NOT NULL
-                        ORDER BY VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384)))
+                        ORDER BY Score
                         """)
                     .FirstOrDefaultAsync();
+                    roomTypeScore = match?.Score;
+                    if (match?.Score < 0.4) roomTypeId = match?.Id;
+            }
 
             if (!styleId.HasValue)
-                styleId = await db.Database
-                    .SqlQuery<int>($"""
-                        SELECT TOP 1 style_id AS Value
+            {
+                var match = await db.Database
+                    .SqlQuery<SimilarityMatch>($"""
+                        SELECT TOP 1 style_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
                         FROM image_style
                         WHERE embedding IS NOT NULL
-                        ORDER BY VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384)))
+                        ORDER BY Score
                         """)
                     .FirstOrDefaultAsync();
+                styleScore = match?.Score;
+                if (match?.Score < 0.4) styleId = match?.Id;
+            }
         }
 
         var query = db.Images.Include(i => i.Category)
@@ -94,7 +109,8 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
         if (styleId.HasValue)
             query = query.Where(i => i.Styles.Any(s => s.StyleId == styleId.Value));
 
-        return Ok(await query.ToListAsync());
+        var images = await query.ToListAsync();
+        return Ok(new SearchResponse(images, req.text, categoryId, categoryScore, roomTypeId, roomTypeScore, styleId, styleScore));
     }
 
     [HttpGet("{id}")]
