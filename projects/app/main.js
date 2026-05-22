@@ -100,17 +100,20 @@ async function populateStylesFilter() {
   });
 }
 
-async function getImages() {
+async function getImages(searchText = '') {
   try {
-    const url = new URL(`${backendURL}/images`);
-    // Only append if the value is truthy
+    const url = new URL(`${backendURL}/images/search`);
     if (selectedCategory)
       url.searchParams.append("categoryId", selectedCategory);
     if (selectedRoomType)
       url.searchParams.append("roomTypeId", selectedRoomType);
     if (selectedStyle) url.searchParams.append("styleId", selectedStyle);
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: searchText }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -123,8 +126,10 @@ async function getImages() {
   }
 }
 
-async function populateImagesFromSearch(){
-  let images = await getImages();
+async function populateImagesFromSearch() {
+  const searchText = document.querySelector('#search-text-input').value;
+  
+  let images = await getImages(searchText);
 
   const container = document.getElementById('image-output-container');
   container.replaceChildren();
