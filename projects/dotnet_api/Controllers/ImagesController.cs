@@ -32,16 +32,16 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
     [HttpPost("search")]
     public async Task<IActionResult> Search([FromQuery] int? categoryId, [FromQuery] int? roomTypeId, [FromQuery] int? styleId, EmbeddingRequest req)
     {
-        float[]? embedding = null;
+        PythonKeyWordsResponse? embedding = null;
         if (!string.IsNullOrWhiteSpace(req.text))
         {
             var client = httpClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync("http://python_api:8000/embeddings", new { text = req.text });
+            var response = await client.PostAsJsonAsync("http://python_api:8000/keywords", new { text = req.text });
 
             if (!response.IsSuccessStatusCode)
                 return Problem("Failed to generate embedding from Python API.");
 
-            var result = await response.Content.ReadFromJsonAsync<PythonEmbeddingResponse>();
+            var result = await response.Content.ReadFromJsonAsync<PythonKeyWordsResponse>();
             embedding = result?.embedding;
         }
 

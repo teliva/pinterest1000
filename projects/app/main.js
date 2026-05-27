@@ -161,15 +161,6 @@ function insertImageCard(imageUrl) {
   return clone;
 }
 
-
-
-
-
-
-
-
-
-
 // Application entry point
 document.addEventListener("DOMContentLoaded", async () => {
   await populateCategoryFilter();
