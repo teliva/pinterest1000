@@ -3,6 +3,7 @@
 for i in {1..30}; do
   /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "$SA_PASSWORD" -i /scripts/create_img_tables.sql && \
   /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "$SA_PASSWORD" -i /scripts/populate_img_data.sql && \
+  /opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P "$SA_PASSWORD" -i /scripts/create_sp.sql && \
   exit 0
   echo 'Waiting for mssql...'
   sleep 5

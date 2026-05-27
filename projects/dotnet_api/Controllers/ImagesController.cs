@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PinterestApi.Data;
@@ -32,7 +33,7 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
     [HttpPost("search")]
     public async Task<IActionResult> Search([FromQuery] int? categoryId, [FromQuery] int? roomTypeId, [FromQuery] int? styleId, EmbeddingRequest req)
     {
-        PythonKeyWordsResponse? embedding = null;
+        KeywordMatch[] keywords = [];
         if (!string.IsNullOrWhiteSpace(req.text))
         {
             var client = httpClientFactory.CreateClient();
@@ -42,56 +43,24 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
                 return Problem("Failed to generate embedding from Python API.");
 
             var result = await response.Content.ReadFromJsonAsync<PythonKeyWordsResponse>();
-            embedding = result?.embedding;
+            keywords = result?.keywords ?? [];
         }
 
         double? categoryScore = null, roomTypeScore = null, styleScore = null;
 
-        if (embedding != null)
+        if (keywords.Length > 0)
         {
-            var vectorJson = $"[{string.Join(",", embedding)}]";
+            var embeddingsJson = JsonSerializer.Serialize(keywords.Select(k => k.embedding));
 
-            if (!categoryId.HasValue)
-            {
-                var match = await db.Database
-                    .SqlQuery<SimilarityMatch>($"""
-                        SELECT TOP 1 category_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
-                        FROM image_categories
-                        WHERE embedding IS NOT NULL
-                        ORDER BY Score
-                        """)
-                    .FirstOrDefaultAsync();
-                
-                categoryScore = match?.Score;
-                if (match?.Score < 0.4) categoryId = match?.Id;
-            }
+            var match = await db.Database
+                .SqlQuery<SpBestMatchResult>($"EXEC dbo.sp_FindBestMatches @embeddings_json = {embeddingsJson}")
+                .FirstOrDefaultAsync();
 
-            if (!roomTypeId.HasValue)
+            if (match is not null)
             {
-                var match = await db.Database
-                    .SqlQuery<SimilarityMatch>($"""
-                        SELECT TOP 1 room_type_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
-                        FROM image_room_type
-                        WHERE embedding IS NOT NULL
-                        ORDER BY Score
-                        """)
-                    .FirstOrDefaultAsync();
-                    roomTypeScore = match?.Score;
-                    if (match?.Score < 0.4) roomTypeId = match?.Id;
-            }
-
-            if (!styleId.HasValue)
-            {
-                var match = await db.Database
-                    .SqlQuery<SimilarityMatch>($"""
-                        SELECT TOP 1 style_id AS Id, VECTOR_DISTANCE('cosine', embedding, CAST({vectorJson} AS VECTOR(384))) AS Score
-                        FROM image_style
-                        WHERE embedding IS NOT NULL
-                        ORDER BY Score
-                        """)
-                    .FirstOrDefaultAsync();
-                styleScore = match?.Score;
-                if (match?.Score < 0.4) styleId = match?.Id;
+                if (!categoryId.HasValue && match.BestCategoryId is not null) { categoryScore = match.BestCategoryScore; if (match.BestCategoryScore < 0.4) categoryId = match.BestCategoryId; }
+                if (!roomTypeId.HasValue && match.BestRoomTypeId is not null) { roomTypeScore = match.BestRoomTypeScore; if (match.BestRoomTypeScore < 0.4) roomTypeId = match.BestRoomTypeId; }
+                if (!styleId.HasValue && match.BestStyleId is not null) { styleScore = match.BestStyleScore; if (match.BestStyleScore < 0.4 ) styleId = match.BestStyleId; }
             }
         }
 
@@ -110,7 +79,7 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
             query = query.Where(i => i.Styles.Any(s => s.StyleId == styleId.Value));
 
         var images = await query.ToListAsync();
-        return Ok(new SearchResponse(images, req.text, categoryId, categoryScore, roomTypeId, roomTypeScore, styleId, styleScore));
+        return Ok(new SearchResponse(images, req.text, categoryId, categoryScore, roomTypeId, roomTypeScore, styleId, styleScore, [.. keywords.Select(k => k.keyword)]));
     }
 
     [HttpGet("{id}")]
