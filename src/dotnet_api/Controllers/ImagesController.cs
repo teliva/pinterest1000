@@ -108,7 +108,18 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
             query = query.Where(i => i.Styles.Any(s => s.StyleId == styleId.Value));
 
         var images = await query.ToListAsync();
-        return Ok(new SearchResponse(images, req.text, categoryId, categoryScore, roomTypeId, roomTypeScore, styleId, styleScore, [.. keywords.Select(k => k.keyword)]));
+
+        string? categoryDescription = categoryId.HasValue
+            ? await db.ImageCategories.Where(c => c.CategoryId == categoryId.Value).Select(c => c.Description).FirstOrDefaultAsync()
+            : null;
+        string? roomTypeDescription = roomTypeId.HasValue
+            ? await db.ImageRoomTypes.Where(r => r.RoomTypeId == roomTypeId.Value).Select(r => r.Description).FirstOrDefaultAsync()
+            : null;
+        string? styleDescription = styleId.HasValue
+            ? await db.ImageStyles.Where(s => s.StyleId == styleId.Value).Select(s => s.Description).FirstOrDefaultAsync()
+            : null;
+
+        return Ok(new SearchResponse(images, req.text, categoryId, categoryScore, categoryDescription, roomTypeId, roomTypeScore, roomTypeDescription, styleId, styleScore, styleDescription, [.. keywords.Select(k => k.keyword)]));
     }
 
     [HttpGet("{id}")]
