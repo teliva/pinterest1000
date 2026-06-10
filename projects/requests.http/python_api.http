@@ -1,0 +1,20 @@
+@baseUrl = http://localhost:8084
+
+### Health check
+GET {{baseUrl}}/health
+
+### Generate embedding
+POST {{baseUrl}}/embeddings
+Content-Type: application/json
+
+{
+  "text": "modern living room with wood accents"
+}
+
+### Extract keywords
+POST {{baseUrl}}/keywords
+Content-Type: application/json
+
+{
+  "text": "small meeting room with a wooden meeting table"
+}

@@ -31,13 +31,13 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
     }
 
     [HttpPost("search")]
-    public async Task<IActionResult> Search([FromQuery] int? categoryId, [FromQuery] int? roomTypeId, [FromQuery] int? styleId, EmbeddingRequest req)
+    public async Task<IActionResult> Search(EmbeddingRequest req)
     {
         KeywordMatch[] keywords = [];
         if (!string.IsNullOrWhiteSpace(req.text))
         {
             var client = httpClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync("http://python_api:8000/keywords", new { text = req.text });
+            var response = await client.PostAsJsonAsync("http://localhost:8084/keywords", new { text = req.text });
 
             if (!response.IsSuccessStatusCode)
                 return Problem("Failed to generate embedding from Python API.");
@@ -46,15 +46,44 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
             keywords = result?.keywords ?? [];
         }
 
+        var categoryId = req.categoryId;
+        var roomTypeId = req.roomTypeId;
+        var styleId = req.styleId;
         double? categoryScore = null, roomTypeScore = null, styleScore = null;
 
         if (keywords.Length > 0)
         {
             var embeddingsJson = JsonSerializer.Serialize(keywords.Select(k => k.embedding));
 
-            var match = await db.Database
-                .SqlQuery<SpBestMatchResult>($"EXEC dbo.sp_FindBestMatches @embeddings_json = {embeddingsJson}")
-                .FirstOrDefaultAsync();
+            SpBestMatchResult? match = null;
+            await db.Database.OpenConnectionAsync();
+            try
+            {
+                var connection = (Microsoft.Data.SqlClient.SqlConnection)db.Database.GetDbConnection();
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = "dbo.sp_FindBestMatches";
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@embeddings_json", embeddingsJson);
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    int catIdOrd = reader.GetOrdinal("BestCategoryId"), catScoreOrd = reader.GetOrdinal("BestCategoryScore");
+                    int roomIdOrd = reader.GetOrdinal("BestRoomTypeId"), roomScoreOrd = reader.GetOrdinal("BestRoomTypeScore");
+                    int styleIdOrd = reader.GetOrdinal("BestStyleId"), styleScoreOrd = reader.GetOrdinal("BestStyleScore");
+                    match = new SpBestMatchResult(
+                        reader.IsDBNull(catIdOrd) ? null : reader.GetInt32(catIdOrd),
+                        reader.IsDBNull(catScoreOrd) ? null : reader.GetDouble(catScoreOrd),
+                        reader.IsDBNull(roomIdOrd) ? null : reader.GetInt32(roomIdOrd),
+                        reader.IsDBNull(roomScoreOrd) ? null : reader.GetDouble(roomScoreOrd),
+                        reader.IsDBNull(styleIdOrd) ? null : reader.GetInt32(styleIdOrd),
+                        reader.IsDBNull(styleScoreOrd) ? null : reader.GetDouble(styleScoreOrd)
+                    );
+                }
+            }
+            finally
+            {
+                await db.Database.CloseConnectionAsync();
+            }
 
             if (match is not null)
             {

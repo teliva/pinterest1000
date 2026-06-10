@@ -1,6 +1,6 @@
 namespace PinterestApi.Models;
 
-public record EmbeddingRequest(string? text);
+public record EmbeddingRequest(string? text, int? categoryId, int? roomTypeId, int? styleId);
 public record PythonEmbeddingResponse(string text, float[] embedding, int dimensions);
 public record KeywordMatch(string keyword, float[] embedding);
 public record PythonKeyWordsResponse(KeywordMatch[] keywords);

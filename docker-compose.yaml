@@ -47,6 +47,8 @@ services:
       - "8083:5000"
     volumes:
       - ./projects/dotnet_api:/app:rw
+      - dotnet_bin:/app/bin
+      - dotnet_obj:/app/obj
     working_dir: /app
     environment:
       DOTNET_ENVIRONMENT: Development
@@ -72,3 +74,5 @@ services:
 
 volumes:
   mssql_data:
+  dotnet_bin:
+  dotnet_obj:

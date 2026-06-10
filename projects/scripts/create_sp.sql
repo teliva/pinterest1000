@@ -38,19 +38,19 @@ BEGIN
                 s.style_score
             FROM
                 (SELECT TOP 1 category_id,
-                        VECTOR_DISTANCE(''cosine'', embedding, CAST(' + @embedding + N' AS VECTOR(384))) AS category_score
+                        VECTOR_DISTANCE(''cosine'', embedding, CAST(''' + @embedding + N''' AS VECTOR(384))) AS category_score
                  FROM dbo.image_categories
                  WHERE embedding IS NOT NULL
                  ORDER BY category_score) c
             CROSS JOIN
                 (SELECT TOP 1 room_type_id,
-                        VECTOR_DISTANCE(''cosine'', embedding, CAST(' + @embedding + N' AS VECTOR(384))) AS room_type_score
+                        VECTOR_DISTANCE(''cosine'', embedding, CAST(''' + @embedding + N''' AS VECTOR(384))) AS room_type_score
                  FROM dbo.image_room_type
                  WHERE embedding IS NOT NULL
                  ORDER BY room_type_score) r
             CROSS JOIN
                 (SELECT TOP 1 style_id,
-                        VECTOR_DISTANCE(''cosine'', embedding, CAST(' + @embedding + N' AS VECTOR(384))) AS style_score
+                        VECTOR_DISTANCE(''cosine'', embedding, CAST(''' + @embedding + N''' AS VECTOR(384))) AS style_score
                  FROM dbo.image_style
                  WHERE embedding IS NOT NULL
                  ORDER BY style_score) s;

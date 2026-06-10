@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:8083
+
+### Search images by text only
+POST {{baseUrl}}/api/images/search
+Content-Type: application/json
+
+{
+  "text": "modern living room with wood accents"
+}

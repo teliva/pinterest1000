@@ -26,3 +26,4 @@ public class HealthController(ApplicationDbContext db) : ControllerBase
         }
     }
 }
+d

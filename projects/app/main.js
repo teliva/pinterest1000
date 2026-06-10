@@ -9,6 +9,7 @@ let selectedStyle = 0;
 async function fetchCategories() {
   try {
     const response = await fetch(`${backendURL}/categories`);
+    console.log(response);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -102,18 +103,15 @@ async function populateStylesFilter() {
 
 async function getImages(searchText = '') {
   try {
-    const url = new URL(`${backendURL}/images/search`);
-    if (selectedCategory)
-      url.searchParams.append("categoryId", selectedCategory);
-    if (selectedRoomType)
-      url.searchParams.append("roomTypeId", selectedRoomType);
-    if (selectedStyle) 
-      url.searchParams.append("styleId", selectedStyle);
-
-    const response = await fetch(url, {
+    const response = await fetch(`${backendURL}/images/search`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: searchText }),
+      body: JSON.stringify({
+        text: searchText,
+        categoryId: selectedCategory || null,
+        roomTypeId: selectedRoomType || null,
+        styleId: selectedStyle || null,
+      }),
     });
 
     if (!response.ok) {
