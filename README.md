@@ -1,57 +1,28 @@
 # Pinterest Starter
+Project that will contaion 1000 images that can be used as feeder images to start the ideation process for KITS Assist.
+You can filter categorized images hosted on the content server.
 
-## PostgreSQL Docker Setup
+## Projects
+### App
+A web application for displaying search results and interating with the dotnet api: [here](http://localhost:8082) 
 
-A PostgreSQL database container is configured in `docker-compose.yml`.
+Application uses basic bootstrap and javascript - the UX is not finalized.
 
-### Database details
+### .NET API
+Gateway api to interact with the database and the python api.  This code will be moved to KITSWebApi.  Makes requests to the python api as well as the MSSQL database.
 
-- Database: `postes`
-- User: `postgres`
-- Password: `postgres`
-- Port: `5432`
+### Python API
+Service for producing embeddings used for natural language search.
 
-### Run the database container
+### MSSQL Database
+MSSQL2025 DB that stores the UUID that is linked to the content server image and its category tags. Supports cosine similarity to support natural language search.
 
-```bash
-docker compose up -d
+### Content server
+A contains simulates our content server that will carry the images that can be referenced and sent to the client.
+
+## Setup
+Run the containers and use the web app to interact with the .net api
 ```
-
-### Stop the container
-
-```bash
-docker compose down
+docker compose up
 ```
-
-### Connect to the database
-
-You can connect using any PostgreSQL client at `localhost:5432`.
-
-## Content polling API container
-
-A second container serves the local `content` folder at `http://localhost:8080`.
-
-### API endpoints
-
-- `GET /health` — service health check
-- `GET /files` — list all files under `content`
-- `GET /poll` — equivalent folder polling endpoint
-- `GET /content/<path>` — return file contents
-
-### Run both containers
-
-```bash
-docker compose up -d
-```
-
-### Access the content API
-
-Open `http://localhost:8081/files` or `http://localhost:8081/poll`.
-
-## Simple webpage container
-
-A third container serves the static `src/app/index.html` webpage at `http://localhost:8082`.
-
-### Access the webpage
-
-Open `http://localhost:8082` in your browser.
+Docker will  automatically spin up and populate the DB with the appropriate data.
