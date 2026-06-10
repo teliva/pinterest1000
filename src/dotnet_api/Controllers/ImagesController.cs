@@ -37,7 +37,7 @@ public class ImagesController(ApplicationDbContext db, IHttpClientFactory httpCl
         if (!string.IsNullOrWhiteSpace(req.text))
         {
             var client = httpClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync("http://localhost:8084/keywords", new { text = req.text });
+            var response = await client.PostAsJsonAsync("http://python_api:8000/keywords", new { req.text });
 
             if (!response.IsSuccessStatusCode)
                 return Problem("Failed to generate embedding from Python API.");
