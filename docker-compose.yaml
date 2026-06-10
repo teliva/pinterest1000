@@ -15,7 +15,7 @@ services:
     ports:
       - "8082:80"
     volumes:
-      - ./projects/app:/usr/share/nginx/html:ro
+      - ./src/app:/usr/share/nginx/html:ro
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2025-latest
@@ -33,7 +33,7 @@ services:
     depends_on:
       - mssql
     volumes:
-      - ./projects/scripts:/scripts:ro
+      - ./src/scripts:/scripts:ro
     environment:
       SA_PASSWORD: "YourStrongPassword123!"
     command: ["bash", "/scripts/init_db.sh"]
@@ -46,7 +46,7 @@ services:
     ports:
       - "8083:5000"
     volumes:
-      - ./projects/dotnet_api:/app:rw
+      - ./src/dotnet_api:/app:rw
       - dotnet_bin:/app/bin
       - dotnet_obj:/app/obj
     working_dir: /app
@@ -58,7 +58,7 @@ services:
       - mssql_init
 
   python_api:
-    build: ./projects/python_api
+    build: ./src/python_api
     container_name: pinterest_python_api
     restart: unless-stopped
     ports:

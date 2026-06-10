@@ -1,6 +1,6 @@
 <Solution>
-  <Folder Name="/projects/" />
-  <Folder Name="/projects/dotnet_api/">
-    <Project Path="projects/dotnet_api/pinterest_api.csproj" />
+  <Folder Name="/src/" />
+  <Folder Name="/src/dotnet_api/">
+    <Project Path="src/dotnet_api/pinterest_api.csproj" />
   </Folder>
 </Solution>
