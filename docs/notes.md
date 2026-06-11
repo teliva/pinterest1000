@@ -13,4 +13,3 @@ keywords = kw_model.extract_keywords(
     seed_keywords=my_database_vocabulary # Nudges KeyBERT to prioritize these concepts
 )
 ```
-

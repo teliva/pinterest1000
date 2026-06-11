@@ -8,7 +8,7 @@ POST {{baseUrl}}/embeddings
 Content-Type: application/json
 
 {
-  "text": "modern living room with wood accents"
+  "text": "industiral"
 }
 
 ### Extract keywords
